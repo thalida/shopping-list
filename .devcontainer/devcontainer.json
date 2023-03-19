@@ -6,9 +6,21 @@
 	"service": "app",
 	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 	"features": {
-		"ghcr.io/devcontainers-contrib/features/black:2": {},
-		"ghcr.io/devcontainers-contrib/features/poetry:2": {},
-		"ghcr.io/devcontainers-contrib/features/zsh-plugins:0": {}
+		"ghcr.io/devcontainers-contrib/features/black:2": {
+			"version": "latest"
+		},
+		"ghcr.io/devcontainers-contrib/features/poetry:2": {
+			"version": "latest"
+		},
+		"ghcr.io/devcontainers-contrib/features/zsh-plugins:0": {
+			"plugins": "ssh-agent npm",
+			"omzPlugins": "https://github.com/zsh-users/zsh-autosuggestions",
+			"username": "root"
+		},
+		"ghcr.io/devcontainers/features/node:1": {
+			"nodeGypDependencies": true,
+			"version": "lts"
+		}
 	},
 	"customizations": {
 		"vscode": {
@@ -52,7 +64,8 @@
 		}
 	},
 	"forwardPorts": [
-		8000
+		8000,
+		8080
 	],
 	"postCreateCommand": "bash -i /workspaces/shopping-list/.devcontainer/scripts/postCreateCommand.sh",
 	"postStartCommand": "bash -i /workspaces/shopping-list/.devcontainer/scripts/postStartCommand.sh",
