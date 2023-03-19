@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
+import { graphql, useQuery } from "@/gql";
 import type { TUUID } from "@/types/shared";
 import type { IUsers, IUser } from "@/types/user";
 import { useAuthStore } from "./auth";
@@ -23,12 +24,20 @@ export const useUsersStore = defineStore("users", () => {
   });
 
   async function fetchMe() {
-    // const { data } = await useQuery({ query: MeDocument, cachePolicy: "network-only" });
-    // if (data.value?.me) {
-    //   const user = data.value.me as IUser;
-    //   currentUserUid.value = user.uid;
-    //   users.value[user.uid] = user;
-    // }
+    const meDocument = graphql(/* GraphQL */ `
+      query Me {
+        me {
+          uid,
+          username,
+        }
+      }
+    `);
+    const { data } = await useQuery({ query: meDocument, cachePolicy: "network-only" });
+    if (data.value?.me) {
+      const user = data.value.me as IUser;
+      currentUserUid.value = user.uid;
+      users.value[user.uid] = user;
+    }
   }
 
   return {

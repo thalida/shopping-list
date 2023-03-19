@@ -4,5 +4,4 @@ import AppHeader from "@/components/AppHeader.vue";
 
 <template>
   <AppHeader />
-  Hello World!
 </template>

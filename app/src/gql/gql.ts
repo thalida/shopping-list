@@ -15,6 +15,7 @@ import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-
 const documents = {
     "\n        mutation VerifyToken($token: String!) {\n          verifyToken(input: {token: $token}) {\n            payload\n          }\n        }\n      ": types.VerifyTokenDocument,
     "\n      mutation RegisterSocial($accessToken: String!, $socialBackend: String!) {\n        registerSocial(input: { accessToken: $accessToken, socialBackend: $socialBackend }) {\n          token\n        }\n      }\n    ": types.RegisterSocialDocument,
+    "\n      query Me {\n        me {\n          uid,\n          username,\n        }\n      }\n    ": types.MeDocument,
 };
 
 /**
@@ -39,6 +40,10 @@ export function graphql(source: "\n        mutation VerifyToken($token: String!)
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n      mutation RegisterSocial($accessToken: String!, $socialBackend: String!) {\n        registerSocial(input: { accessToken: $accessToken, socialBackend: $socialBackend }) {\n          token\n        }\n      }\n    "): (typeof documents)["\n      mutation RegisterSocial($accessToken: String!, $socialBackend: String!) {\n        registerSocial(input: { accessToken: $accessToken, socialBackend: $socialBackend }) {\n          token\n        }\n      }\n    "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n      query Me {\n        me {\n          uid,\n          username,\n        }\n      }\n    "): (typeof documents)["\n      query Me {\n        me {\n          uid,\n          username,\n        }\n      }\n    "];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

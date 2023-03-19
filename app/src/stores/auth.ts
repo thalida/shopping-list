@@ -1,10 +1,9 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import { useStorage } from "@vueuse/core";
-import { useMutation } from "villus";
 
 import type { TAuthToken } from "@/types/user";
-import { graphql } from "@/gql";
+import { graphql, useMutation } from "@/gql";
 
 export const useAuthStore = defineStore("auth", () => {
   const authToken = useStorage("shoppingList:authToken", null as TAuthToken | null | undefined);
