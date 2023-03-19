@@ -19,3 +19,16 @@ class StoreSection(models.Model):
         Item,
         related_name='store_sections'
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                models.functions.Lower('name'),
+                name='store_section_name_unique'
+            ),
+            models.UniqueConstraint(
+                fields=['name', 'store'],
+                condition=models.Q(store__isnull=False),
+                name='store_section_name_store_unique'
+            ),
+        ]

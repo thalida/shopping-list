@@ -1,41 +1,32 @@
 import graphene
 from graphene_django.types import DjangoObjectType
+from graphene_django.filter import DjangoFilterConnectionField
+
 import graphql_jwt
 from social_django.utils import load_strategy, load_backend
-from api.permissions import IsAuthenticated
-from .models import User
+
+from api.permissions import IsAuthenticated, IsTeamMember, login_required
+from .models import User, Team
 
 
 class UserNode(IsAuthenticated, DjangoObjectType):
     class Meta():
         model = User
+        interfaces = (graphene.relay.Node, )
         filter_fields = ["uid", "username"]
         exclude = ["email", "password"]
+
+
+class TeamNode(IsAuthenticated, DjangoObjectType):
+    class Meta():
+        model = Team
         interfaces = (graphene.relay.Node, )
-
-
-class Register(graphene.relay.ClientIDMutation):
-    class Input:
-        username = graphene.String(required=True)
-        email = graphene.String(required=True)
-        password = graphene.String(required=True)
-
-    user = graphene.Field(UserNode)
-    token = graphene.String()
+        filter_fields = ["uid", "name"]
 
     @classmethod
-    def mutate_and_get_payload(cls, root, info, **input):
-        user = User.objects.create(
-            username=input['username'],
-            email=input['email']
-        )
-        user.set_password(input['password'])
-        user.save()
-
-        payload = graphql_jwt.utils.jwt_payload(user)
-        token = graphql_jwt.utils.jwt_encode(payload)
-
-        return Register(user=user, token=token)
+    @login_required
+    def get_queryset(cls, queryset, info):
+        return queryset.filter(members=info.context.user)
 
 
 class RegisterFromSocial(graphene.relay.ClientIDMutation):
@@ -61,9 +52,44 @@ class RegisterFromSocial(graphene.relay.ClientIDMutation):
         return RegisterFromSocial(user=user, token=token)
 
 
+class CreateTeam(graphene.relay.ClientIDMutation):
+    team = graphene.Field(TeamNode)
+
+    @classmethod
+    @login_required
+    def mutate_and_get_payload(cls, root, info, **input):
+        team = Team.objects.create(
+            **input,
+            owner=info.context.user
+        )
+        team.members.add(info.context.user)
+
+        return CreateTeam(team=team)
+
+
+class UpdateTeam(graphene.relay.ClientIDMutation):
+    class Input:
+        uid = graphene.UUID(required=True)
+        name = graphene.String(required=False)
+
+    team = graphene.Field(TeamNode)
+
+    @classmethod
+    @login_required
+    def mutate_and_get_payload(cls, root, info, **input):
+        team = Team.objects.get(uid=input['uid'])
+        team.name = input['name']
+        team.save()
+
+        return UpdateTeam(team=team)
+
+
 class UserQuery(graphene.ObjectType):
     user = graphene.relay.Node.Field(UserNode)
     me = graphene.Field(UserNode)
+
+    team = graphene.relay.Node.Field(TeamNode)
+    teams = DjangoFilterConnectionField(TeamNode)
 
     def resolve_me(self, info):
         if info.context.user.is_anonymous:
@@ -77,6 +103,7 @@ class UserMutation(graphene.ObjectType):
     verify_token = graphql_jwt.relay.Verify.Field()
     refresh_token = graphql_jwt.relay.Refresh.Field()
     revoke_token = graphql_jwt.relay.Revoke.Field()
-
-    register = Register.Field()
     register_social = RegisterFromSocial.Field()
+
+    create_team = CreateTeam.Field()
+    update_team = UpdateTeam.Field()

@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from users.models import Team
 
 
 class ShoppingList(models.Model):
@@ -8,3 +9,8 @@ class ShoppingList(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     name = models.CharField(max_length=255)
+    team = models.ForeignKey(
+        Team,
+        on_delete=models.CASCADE,
+        related_name="shopping_lists"
+    )

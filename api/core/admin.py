@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Item, Project, ProjectItem, ShoppingList, Store, StoreSection
+from core.models import Item, Project, ProjectItem, ShoppingList, Store, StoreSection
 
 admin.site.register(Item)
 admin.site.register(Project)

@@ -1,5 +1,7 @@
 import uuid
 from django.db import models
+from django.dispatch import receiver
+from .user import User
 
 
 class Team(models.Model):
@@ -9,7 +11,26 @@ class Team(models.Model):
 
     name = models.CharField(max_length=255)
     owner = models.ForeignKey(
-        'User',
+        User,
         on_delete=models.CASCADE,
         related_name='owned_teams'
     )
+    members = models.ManyToManyField(
+        User,
+        related_name='teams',
+    )
+
+
+@receiver(models.signals.post_save, sender=User)
+def save_from_user(sender, instance, created, **kwargs):
+    if not created:
+        return
+
+    team = Team.objects.create(
+        name=f"{instance.username}'s Team",
+        owner=instance
+    )
+
+    team.members.add(instance)
+
+    team.save()

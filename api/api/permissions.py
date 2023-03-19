@@ -13,6 +13,13 @@ def login_required(func):
     return wrapper
 
 
+class IsTeamMember:
+    @classmethod
+    @login_required
+    def get_queryset(cls, queryset, info):
+        return queryset.filter(team__members=info.context.user)
+
+
 class IsAuthenticated:
     @classmethod
     @login_required

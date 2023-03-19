@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from users.models import Team
 
 
 class Store(models.Model):
