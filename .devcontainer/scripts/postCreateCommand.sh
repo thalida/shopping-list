@@ -7,5 +7,5 @@ set +o allexport
 cd /workspaces/shopping-list/api
 poetry install
 
-# cd /workspaces/shopping-list/app
-# npm install
+cd /workspaces/shopping-list/app
+npm install

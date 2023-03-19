@@ -53,6 +53,8 @@ if DEBUG:
     CORS_ALLOWED_ORIGIN_REGEXES += [
         r"^http(s)?://localhost:8080$",
         r"^http(s)?://localhost:8000$",
+        r"^http(s)?://127.0.0.1:8080$",
+        r"^http(s)?://127.0.0.1:8000$",
     ]
 
 

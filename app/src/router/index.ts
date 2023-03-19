@@ -1,23 +1,55 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import { createRouter, createWebHistory } from "vue-router";
+import Home from "@/views/HomeView.vue";
+import Signout from "@/views/SignoutView.vue";
+import { useAuthStore } from "@/stores/auth";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
-      name: 'home',
-      component: HomeView,
+      path: "/",
+      name: "Home",
+      component: Home,
     },
     {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue'),
+      path: "/signout",
+      name: "Signout",
+      component: Signout,
+      alias: "/logout",
     },
+    // {
+    //   path: "/n/:notebookUid",
+    //   props: true,
+    //   name: "Notebook",
+    //   component: () => import("@/views/NotebookView.vue"),
+    // },
+    // {
+    //   path: "/p/:pageUid",
+    //   props: true,
+    //   name: "Page",
+    //   component: () => import("@/views/PageView.vue"),
+    // },
   ],
-})
+});
 
-export default router
+router.beforeEach(async (to) => {
+  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+
+  if (!requiresAuth) {
+    return true;
+  }
+
+  const authStore = useAuthStore();
+  const isAuthenticated = authStore.isAuthenticated;
+
+  if (isAuthenticated) {
+    return true;
+  }
+
+  return {
+    name: "Login",
+    query: { redirect: to.fullPath },
+  };
+});
+
+export default router;
