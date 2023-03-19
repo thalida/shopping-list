@@ -59,7 +59,9 @@
 				"ms-python.vscode-pylance",
 				"GitHub.copilot",
 				"GitHub.copilot-labs",
-				"sleistner.vscode-fileutils"
+				"sleistner.vscode-fileutils",
+				"Vue.vscode-typescript-vue-plugin",
+				"Vue.volar"
 			]
 		}
 	},
